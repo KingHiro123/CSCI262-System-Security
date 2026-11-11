@@ -25,20 +25,6 @@ Pins from earlier/later windows are rejected (GRACE_WINDOWS = 0, so the first
 pin Device prints is valid only for the remainder of its window). The same
 algorithm as Device.py is used; no communication happens between the programs.
 """
-
-"""
-Represents the service the user wants to connect to.
-Usage — new user:
-Connect <username> new
-• Prompt the user to enter a password twice and check the two entries match.
-• Apply some password appropriateness check (you choose the criteria — e.g., minimum length,
-not equal to the username — and document them).
-• If the password is acceptable, store username and password in a file named Passwords.txt in the
-current working directory.
-• Passwords.txt must be cleartext and human-readable, with the password clearly visible. (This
-is insecure in practice but simplifies the assignment.) 
-"""
-
 import getpass
 import hashlib
 import hmac
@@ -95,6 +81,10 @@ def new_user(username: str) -> int:
         print("Failure: that username already exists.")
         return 1
     p1 = getpass.getpass("Enter password: ")
+    err = check_password(username, p1)          # check the first entry right away
+    if err:
+        print("Failure: " + err)
+        return 1
     p2 = getpass.getpass("Re-enter password: ")
     if p1 != p2:
         print("Failure: passwords do not match.")
@@ -103,7 +93,16 @@ def new_user(username: str) -> int:
     if err:
         print("Failure: " + err)
         return 1
+    # make sure the new user starts on a fresh line, even if the file
+    # was edited by hand and its last line has no newline at the end
+    needs_newline = False
+    if os.path.exists(PASSWORD_FILE) and os.path.getsize(PASSWORD_FILE) > 0:
+        with open(PASSWORD_FILE, "rb") as f:
+            f.seek(-1, os.SEEK_END)
+            needs_newline = f.read(1) not in (b"\n", b"\r")
     with open(PASSWORD_FILE, "a", encoding="utf-8") as f:
+        if needs_newline:
+            f.write("\n")
         f.write(f"{username}\t{p1}\n")
     print(f"Success: user '{username}' created.")
     return 0
@@ -126,10 +125,12 @@ def login(username: str, password: str, pin: str) -> int:
 
 def main() -> None:
     if len(sys.argv) == 3 and sys.argv[2] == "new":
+        print(f"Total count: {len(sys.argv)}")
         sys.exit(new_user(sys.argv[1]))
     if len(sys.argv) == 4:
+        print(f"Total count: {len(sys.argv)}")
         sys.exit(login(sys.argv[1], sys.argv[2], sys.argv[3]))
-    print("Usage:\n  Connect <username> new\n  Connect <username> <password> <pin>")
+    print("Usage:\n  Connect <username> new --> Create a new user \n  Connect <username> <password> <pin> --> Logging in with a password and pin")
     sys.exit(1)
 
 

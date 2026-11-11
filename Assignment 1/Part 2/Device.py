@@ -43,9 +43,7 @@ Device: 217281
 • Each pin must be a deterministic function of (username, password, current time window) such
 that Connect, knowing the username and password and reading the same clock, can
 independently compute and verify the pin.
-SIM-A1-CSCI262-2026S4-v1
-Copyright SCIT, University of Wollongong, 2026
-Page 6 of 7
+
 • Time window rule: Divide time into 15-second windows. A pin printed during window W is valid for
 the duration of window W. Decide and document how you handle the very first pin — for example,
 whether it is valid for the remainder of the current window (possibly less than 15 seconds) or
