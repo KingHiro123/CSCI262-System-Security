@@ -16,7 +16,7 @@ import os
 import random
 import sys
 
-OUT_DIR = "output"
+OUT_DIR = ""
 BASELINE_LOG = os.path.join(OUT_DIR, "baseline_log.txt")
 BASELINE_TOTALS = os.path.join(OUT_DIR, "baseline_daily_totals.txt")
 BASELINE_STATS = os.path.join(OUT_DIR, "baseline_stats.txt")
@@ -446,8 +446,8 @@ def report_alerts(events, baseline, totals):
     flagged = 0
     for d, row in enumerate(totals, 1):
         c = anomaly_counter(events, baseline, row)
-        status = "FLAGGED" if c >= threshold else "okay"
-        flagged += status == "FLAGGED"
+        status = "flagged" if c >= threshold else "okay"
+        flagged += status == "flagged"
         print("  %-5d %-10.2f %-10d %-8s" % (d, c, threshold, status))
     print("  -> %d of %d day(s) flagged (threshold = 2 x sum of weights = %d)"
           % (flagged, len(totals), threshold))
